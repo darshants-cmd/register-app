@@ -8,7 +8,7 @@ pipeline {
         APP_NAME = "register-app-pipeline"
         RELEASE = "1.0.0"
         DOCKER_USER = "darshantsd"
-        DOCKER_PASS = 'dockerhub'
+        DOCKER_PASS = credentials('dockerhub')  // Ensure 'dockerhub' is the correct credential ID for Docker Hub
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
@@ -40,7 +40,7 @@ pipeline {
         stage("SonarQube Analysis") {
             steps {
                 script {
-                    withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-tokan') {
+                    withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-tokan') {  // Corrected the credentials ID
                         sh "mvn sonar:sonar"
                     }
                 }
@@ -50,7 +50,7 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-tokan'
+                    waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-tokan'  // Corrected the credentials ID
                 }
             }
         }
@@ -58,7 +58,7 @@ pipeline {
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry('', DOCKER_PASS) {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_PASS) {  // Docker registry URL and credentials ID
                         def docker_image = docker.build("${IMAGE_NAME}")
                         docker_image.push("${IMAGE_TAG}")
                         docker_image.push('latest')
