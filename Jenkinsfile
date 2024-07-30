@@ -8,7 +8,7 @@ pipeline {
         APP_NAME = "register-app-pipeline"
         RELEASE = "1.0.0"
         DOCKER_USER = "darshantsd"
-        DOCKER_PASS = credentials('dockerhub')  // Ensure 'dockerhub' is the correct credential ID for Docker Hub
+        DOCKER_PASS = credentials('dockerhub-token')  // Ensure 'dockerhub' is the correct credential ID for Docker Hub
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
