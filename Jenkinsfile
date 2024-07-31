@@ -58,20 +58,18 @@ pipeline {
             }
         }
 
+        stage("Docker Image Scan") {
+            steps {
+                sh "trivy image --format table -o trivy-image-report.html darshantsd/register-app:latest"
+            }
+        }
+
         stage("Push Docker Image") {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'dockerhub1', toolName: 'docker') {
                         sh "docker push darshantsd/register-app:latest"
                     }
-                }
-            }
-        }
-
-        stage("Trivy Scan") {
-            steps {
-                script {
-                    sh 'docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image darshantsd/register-app:latest --no-progress --scanners vuln --exit-code 0 --severity HIGH,CRITICAL --format table'
                 }
             }
         }
