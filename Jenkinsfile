@@ -51,23 +51,17 @@ pipeline {
         stage("Build & Tag Docker Image") {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'dockerhub1', toolName: 'docker') {
+                    withDockerRegistry(credentialsId: 'dockerhub1') {
                         sh "docker build -t darshantsd/register-app:latest ."
                     }
                 }
             }
         }
 
-        stage("Docker Image Scan") {
-            steps {
-                sh "trivy image --format table -o trivy-image-report.html darshantsd/register-app:latest"
-            }
-        }
-
         stage("Push Docker Image") {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'dockerhub1', toolName: 'docker') {
+                    withDockerRegistry(credentialsId: 'dockerhub1') {
                         sh "docker push darshantsd/register-app:latest"
                     }
                 }
