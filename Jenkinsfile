@@ -68,17 +68,11 @@ pipeline {
             }
         }
 
-        stage('Install Trivy') {
+        stage("Trivy Scan") {
             steps {
-                sh '''
-                   curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-                '''
-            }
-        }
-
-        stage('Docker Image Scan') {
-            steps {
-                sh "trivy image --format table -o trivy-image-report.html darshantsd/register-app:latest"
+                script {
+                    sh 'docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image darshantsd/register-app:latest --no-progress --scanners vuln --exit-code 0 --severity HIGH,CRITICAL --format table'
+                }
             }
         }
     }
