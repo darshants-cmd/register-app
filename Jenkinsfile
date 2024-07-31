@@ -4,7 +4,7 @@ pipeline {
         jdk 'jdk17'
         maven 'Maven3'
     }
-   
+
     stages {
         stage("Cleanup Workspace") {
             steps {
@@ -33,7 +33,7 @@ pipeline {
         stage("SonarQube Analysis") {
             steps {
                 script {
-                    withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-tokan') {  // Corrected the credentials ID
+                    withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-tokan') {
                         sh "mvn sonar:sonar"
                     }
                 }
@@ -43,7 +43,7 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-tokan'  // Corrected the credentials ID
+                    waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-tokan'
                 }
             }
         }
@@ -65,6 +65,14 @@ pipeline {
                         sh "docker push darshantsd/register-app:latest"
                     }
                 }
+            }
+        }
+
+        stage('Install Trivy') {
+            steps {
+                sh '''
+                   curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+                '''
             }
         }
 
