@@ -47,6 +47,26 @@ pipeline {
                 }
             }
         }
+
+        stage("Build & Tag Docker Image") {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'dockerhub1', toolName: 'docker') {
+                        sh "docker build -t darshantsd/register-app:latest ."
+                    }
+                }
+            }
+        }
+
+        stage("Push Docker Image") {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'dockerhub1', toolName: 'docker') {
+                        sh "docker push darshantsd/register-app:latest"
+                    }
+                }
+            }
+        }
     }
 }
 
