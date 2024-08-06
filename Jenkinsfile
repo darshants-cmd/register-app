@@ -39,13 +39,33 @@ pipeline {
                 }   
             }
         }
-        stage("Quality Gate"){
-           steps {
-               script {
+
+        stage('Quality Gate') {
+            steps {
+                script {
                     waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
-               }
-           }
+                }
+            }
         }
-    
+
+        stage('Build & Tag Docker Image') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker build -t darshantsd/register-app1:latest ."
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker push darshantsd/register-app1:latest"
+                    }
+                }
+            }
+        }
     }
 }
