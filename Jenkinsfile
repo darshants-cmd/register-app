@@ -4,7 +4,13 @@ pipeline {
         jdk 'java17'
         maven 'Maven3'
     }
-    stages { 
+
+    environment {
+        IMAGE_NAME = 'darshantsd/register-app1'
+        IMAGE_TAG = 'latest'
+    }
+
+    stages {
         stage('Cleanup Workspace') {
             steps {
                 cleanWs()
@@ -35,7 +41,7 @@ pipeline {
                     withSonarQubeEnv(credentialsId: 'jenkin-sonarqube-token') {
                         sh "mvn sonar:sonar"
                     }
-                }
+                }   
             }
         }
 
@@ -43,6 +49,16 @@ pipeline {
             steps {
                 script {
                     waitForQualityGate abortPipeline: false, credentialsId: 'jenkin-sonarqube-token'
+                }
+            }
+        }
+
+        stage('Build & Tag Docker Image') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-hub') {
+                        sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                    }
                 }
             }
         }
