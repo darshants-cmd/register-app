@@ -4,6 +4,13 @@ pipeline {
         jdk 'java17'
         maven 'Maven3'
     }
+
+    environment {
+        IMAGE_NAME = 'darshantsd/register-app1'
+        IMAGE_TAG = 'latest'
+        JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
+    }
+
     stages {
         stage('Cleanup Workspace') {
             steps {
@@ -26,6 +33,16 @@ pipeline {
         stage('Test Application') {
             steps {
                 sh 'mvn test'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') { // Assuming 'SonarQube' is the server name configured in Jenkins
+                        sh "mvn sonar:sonar"
+                    }
+                }
             }
         }
     }
